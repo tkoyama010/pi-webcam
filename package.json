@@ -1,0 +1,24 @@
+{
+  "name": "@tkoyama010/pi-webcam",
+  "version": "0.1.0",
+  "description": "pi extension for webcam snapshot capture — let your coding agent see through your camera",
+  "type": "module",
+  "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tkoyama010/pi-webcam.git"
+  },
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src/"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "@types/node": "^22.0.0"
+  }
+}
