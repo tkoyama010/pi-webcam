@@ -5,7 +5,8 @@
   "type": "module",
   "keywords": ["pi-package"],
   "pi": {
-    "extensions": ["./src/index.ts"]
+    "extensions": ["./src/index.ts"],
+    "image": "https://raw.githubusercontent.com/tkoyama010/pi-webcam/main/docs/screenshot.png"
   },
   "main": "dist/index.js",
   "files": [
@@ -22,8 +23,12 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint src/"
   },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*"
+  },
   "devDependencies": {
     "typescript": "^5.6.0",
-    "@types/node": "^22.0.0"
+    "@types/node": "^22.0.0",
+    "@earendil-works/pi-coding-agent": "*"
   }
 }
