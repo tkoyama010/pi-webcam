@@ -15,6 +15,19 @@ Capture webcam snapshots from the terminal agent — no browser, no MCP server, 
 
 ## Installation
 
+### Via pi (recommended)
+
+```bash
+pi install git:github.com/tkoyama010/pi-webcam
+```
+
+To pin a specific version:
+```bash
+pi install git:github.com/tkoyama010/pi-webcam@v0.1.0
+```
+
+### Manual
+
 ```bash
 git clone https://github.com/tkoyama010/pi-webcam.git ~/.pi/agent/extensions/pi-webcam
 ```
