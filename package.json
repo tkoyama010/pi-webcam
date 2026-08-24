@@ -3,9 +3,14 @@
   "version": "0.1.0",
   "description": "pi extension for webcam snapshot capture — let your coding agent see through your camera",
   "type": "module",
+  "keywords": ["pi-package"],
+  "pi": {
+    "extensions": ["./src/index.ts"]
+  },
   "main": "dist/index.js",
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "repository": {
     "type": "git",
