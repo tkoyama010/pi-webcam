@@ -3,9 +3,13 @@
   "version": "0.1.0",
   "description": "pi extension for webcam snapshot capture — let your coding agent see through your camera",
   "type": "module",
-  "keywords": ["pi-package"],
+  "keywords": [
+    "pi-package"
+  ],
   "pi": {
-    "extensions": ["./src/index.ts"],
+    "extensions": [
+      "./src/index.ts"
+    ],
     "image": "https://raw.githubusercontent.com/tkoyama010/pi-webcam/main/docs/screenshot.png"
   },
   "main": "dist/index.js",
@@ -21,14 +25,16 @@
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src/"
+    "lint": "biome check",
+    "format": "biome check --write"
   },
   "peerDependencies": {
     "@earendil-works/pi-coding-agent": "*"
   },
   "devDependencies": {
-    "typescript": "^5.6.0",
+    "@biomejs/biome": "^2.5.10",
+    "@earendil-works/pi-coding-agent": "*",
     "@types/node": "^22.0.0",
-    "@earendil-works/pi-coding-agent": "*"
+    "typescript": "^5.6.0"
   }
 }
