@@ -173,7 +173,7 @@ export default function (pi: ExtensionAPI) {
         const result = capture(device);
 
         if (result.success) {
-          ctx.ui.notify(`Snapshot saved: ${result.path}`, "success");
+          ctx.ui.notify(`Snapshot saved: ${result.path}`, "info");
         } else {
           ctx.ui.notify(`Capture failed: ${result.error}`, "error");
         }

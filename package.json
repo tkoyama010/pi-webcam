@@ -23,8 +23,12 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint src/"
   },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*"
+  },
   "devDependencies": {
     "typescript": "^5.6.0",
-    "@types/node": "^22.0.0"
+    "@types/node": "^22.0.0",
+    "@earendil-works/pi-coding-agent": "*"
   }
 }
