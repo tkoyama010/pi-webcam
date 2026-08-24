@@ -1,8 +1,9 @@
-import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { execSync } from "node:child_process";
 import { existsSync, unlinkSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import process from "node:process";
+import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
 // Cross-platform camera capture for pi.
 // Requires ffmpeg in PATH.
@@ -164,7 +165,10 @@ export default function (pi: ExtensionAPI) {
           ctx.ui.notify("No camera devices found. Is ffmpeg installed?", "warning");
           return;
         }
-        ctx.ui.notify(`Camera devices:\n${devices.map((d, i) => `  [${i}] ${d}`).join("\n")}`, "info");
+        ctx.ui.notify(
+          `Camera devices:\n${devices.map((d, i) => `  [${i}] ${d}`).join("\n")}`,
+          "info",
+        );
         return;
       }
 
