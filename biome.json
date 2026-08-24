@@ -17,7 +17,10 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "preset": "all"
+      "preset": "all",
+      "correctness": {
+        "noUnresolvedImports": "off"
+      }
     }
   },
   "assist": {
