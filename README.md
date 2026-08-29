@@ -2,7 +2,7 @@
 
 **pi extension that lets your coding agent see through your webcam.**
 
-Capture webcam snapshots from the terminal agent — no browser, no MCP server, no UI. Just `/camera take` and the image is in context.
+`pi-package` — capture webcam snapshots from the terminal agent — no browser, no MCP server, no UI. Just `/camera take` and the image is in context.
 
 ---
 
