@@ -35,9 +35,9 @@ function getPlatformConfig(): PlatformConfig {
       listParse: (output: string) =>
         output
           .split("\n")
-          .filter((line) => /^\s*\[AVFoundation/.test(line))
+          .filter((line) => /^\s*\[AVFoundation/u.test(line))
           .map((line) => {
-            const match = line.match(/\[(AVFoundation|AVF)\]\s*\[.+\]\s*(.+)/);
+            const match = line.match(/\[(AVFoundation|AVF)\]\s*\[.+\]\s*(.+)/u);
             return match ? match[2].trim() : "";
           })
           .filter(Boolean),
@@ -52,9 +52,9 @@ function getPlatformConfig(): PlatformConfig {
       listParse: (output: string) =>
         output
           .split("\n")
-          .filter((line) => /\/dev\/video/.test(line))
+          .filter((line) => /\/dev\/video/u.test(line))
           .map((line) => {
-            const match = line.match(/\[.+\]\s*\[.+\]\s*(.+)/);
+            const match = line.match(/\[.+\]\s*\[.+\]\s*(.+)/u);
             return match ? match[1].trim() : "";
           })
           .filter(Boolean),
@@ -69,9 +69,9 @@ function getPlatformConfig(): PlatformConfig {
     listParse: (output: string) =>
       output
         .split("\n")
-        .filter((line) => /\[dshow/.test(line) && /video/.test(line))
+        .filter((line) => /\[dshow/u.test(line) && /video/u.test(line))
         .map((line) => {
-          const match = line.match(/"([^"]+)"\s*\(video\)/);
+          const match = line.match(/"([^"]+)"\s*\(video\)/u);
           return match ? match[1] : "";
         })
         .filter(Boolean),
@@ -151,7 +151,7 @@ export default function (pi: ExtensionAPI) {
       return matches.length > 0 ? matches.map((s) => ({ value: s, label: s })) : null;
     },
     handler: async (args, ctx) => {
-      const parts = args.trim().split(/\s+/);
+      const parts = args.trim().split(/\s+/u);
       const action = parts[0]?.toLowerCase();
 
       if (!action || action === "help") {
