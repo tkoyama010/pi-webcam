@@ -8,8 +8,10 @@
 
 ## What it does
 
-- `/camera take` — captures a snapshot from your default webcam
+- `/camera take` — captures a snapshot from your default webcam **and delivers the image into the conversation** (starts a turn), so the agent sees the frame immediately — no `read` round-trip
 - `/camera list` — lists available camera devices
+- `webcam_snapshot` tool — lets the **agent** capture on its own when you ask "what does the camera see?"; the frame comes back inline as image content
+- Snapshot also renders inline in the TUI (kitty/iterm2 graphics) via a custom entry renderer
 - Works with **text-only models** when paired with [`pi-vision-handoff`](https://github.com/tkoyama010/pi-vision-handoff) (or any vision model natively)
 - Cross-platform: macOS (AVFoundation), Linux (v4l2), Windows (DirectShow)
 
@@ -42,10 +44,10 @@ ln -s ~/src/pi-webcam/src/index.ts ~/.pi/agent/extensions/pi-webcam.ts
 
 ```
 > /camera take
-# Captures from default camera, saves to /tmp/pi-webcam-*.jpg
+# Captures from default camera, saves to /tmp/pi-webcam-*.jpg, shows the frame and sends it to the agent
 
-> /camera take --device 1
-# Uses a specific camera device
+> /camera take /dev/video0
+# Captures from a specific camera device (path or device identifier)
 
 > /camera list
 # Lists all detected camera devices
@@ -62,7 +64,7 @@ After capture, the agent reads the image automatically and can describe it, answ
 
 ## How it works
 
-This extension shells out to `ffmpeg` to capture a single frame from the system webcam. The image file path is returned in the tool result, and the agent's `read` tool picks it up. On text-only models, `pi-vision-handoff` (or a similar vision proxy) describes the image so the model can reason about it.
+This extension shells out to `ffmpeg` to capture a single frame from the system webcam. `/camera take` sends the image into the conversation via `sendUserMessage` (text path + inline jpeg) and renders it in the TUI through a custom entry. The `webcam_snapshot` tool returns the same frame as tool result content, so a multimodal model sees it directly; on text-only models, `pi-vision-handoff` (or a similar vision proxy) describes the image so the model can reason about it.
 
 No web server. No UI. No extra ports.
 

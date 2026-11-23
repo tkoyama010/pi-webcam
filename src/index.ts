@@ -1,9 +1,11 @@
 import { execSync } from "node:child_process";
-import { existsSync, readdirSync, unlinkSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, unlinkSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import process from "node:process";
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
+import { Box, Image, Text } from "@earendil-works/pi-tui";
+import { Type } from "typebox";
 
 // Cross-platform camera capture for pi.
 // Requires ffmpeg in PATH.
@@ -180,7 +182,71 @@ function capture(device?: string): CaptureResult {
   }
 }
 
+/** Read a snapshot off disk as a pi image content block (base64 jpeg). */
+function imageBlock(path: string): { type: "image"; data: string; mimeType: "image/jpeg" } | null {
+  try {
+    return { type: "image", data: readFileSync(path).toString("base64"), mimeType: "image/jpeg" };
+  } catch {
+    return null;
+  }
+}
+
 export default function (pi: ExtensionAPI) {
+  // TUI: render snapshots inline in the transcript. pi does not render images
+  // attached to user messages, but custom entries with a renderer do draw
+  // (kitty/iterm2 graphics; pi core registers the jpeg→png transcoder).
+  pi.registerEntryRenderer("webcam-snapshot", (entry, _opts, theme) => {
+    const data = entry.data as { base64: string; path: string };
+    const box = new Box(1, 1, (text) => theme.bg("customMessageBg", text));
+    box.addChild(new Text(theme.fg("dim", `📷 ${data.path}`)));
+    box.addChild(
+      new Image(
+        data.base64,
+        "image/jpeg",
+        { fallbackColor: (s) => theme.fg("dim", s) },
+        {
+          maxWidthCells: 64,
+        },
+      ),
+    );
+    return box;
+  });
+
+  // Tool: the AGENT can capture on demand — the result carries the frame inline.
+  pi.registerTool({
+    name: "webcam_snapshot",
+    label: "Webcam Snapshot",
+    description:
+      "Capture a snapshot from the webcam. Returns the JPEG image inline plus its file path. Use when the user asks what the camera sees or to visually check the room/desk/screen.",
+    promptSnippet: "Capture a webcam snapshot and return the frame as an image",
+    promptGuidelines: [
+      "Use webcam_snapshot when the user asks what the camera sees, to check the room, or to look at something physically in front of the desk.",
+    ],
+    parameters: Type.Object({
+      device: Type.Optional(
+        Type.String({
+          description: "V4L2 device path, e.g. /dev/video0. Default: first capture node.",
+        }),
+      ),
+    }),
+    async execute(_toolCallId, params) {
+      const result = capture(params.device);
+      if (!result.success) {
+        return {
+          content: [{ type: "text", text: `Capture failed: ${result.error}` }],
+          isError: true,
+          details: undefined,
+        };
+      }
+      const content: Array<
+        { type: "text"; text: string } | { type: "image"; data: string; mimeType: "image/jpeg" }
+      > = [{ type: "text", text: `Webcam snapshot: ${result.path}` }];
+      const img = imageBlock(result.path);
+      if (img) content.push(img);
+      return { content, details: { path: result.path } };
+    },
+  });
+
   pi.registerCommand("camera", {
     description: "Capture webcam snapshots — /camera take [device] | /camera list",
     getArgumentCompletions(prefix: string) {
@@ -213,10 +279,29 @@ export default function (pi: ExtensionAPI) {
       if (action === "take") {
         const device = parts.slice(1).join(" ") || "";
         const result = capture(device);
-        if (result.success) {
-          ctx.ui.notify(`Snapshot saved: ${result.path}`, "info");
-        } else {
+        if (!result.success) {
           ctx.ui.notify(`Capture failed: ${result.error}`, "error");
+          return;
+        }
+        const content: Array<
+          { type: "text"; text: string } | { type: "image"; data: string; mimeType: "image/jpeg" }
+        > = [{ type: "text", text: `/camera take — webcam snapshot saved to ${result.path}` }];
+        const img = imageBlock(result.path);
+        if (img) {
+          content.push(img);
+          // visible frame in the TUI transcript
+          pi.appendEntry("webcam-snapshot", { base64: img.data, path: result.path });
+        }
+        try {
+          // idle: sends immediately and starts a turn — the agent gets the frame
+          pi.sendUserMessage(content);
+        } catch {
+          // streaming: needs an explicit delivery mode, else rejected
+          try {
+            pi.sendUserMessage(content, { deliverAs: "followUp" });
+          } catch {
+            ctx.ui.notify(`Snapshot saved: ${result.path}`, "info");
+          }
         }
         return;
       }
